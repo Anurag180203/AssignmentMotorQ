@@ -5,6 +5,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const { Kafka } = require('kafkajs');
 
+require('dotenv').config();
+
 // Rate limiting properties
 let tokens = 5;
 let maxTokens = 5;
@@ -12,11 +14,11 @@ let lastRefill = Date.now();
 let refillInterval = 60000;
 
 const kafka = new Kafka({
-    clientId: 'vin-consumer',
-    brokers: ['localhost:9092']
+    clientId: process.env.KAFKA_CLIENT_ID,
+    brokers: [process.env.KAFKA_BROKER]
 });
 
-const consumer = kafka.consumer({ groupId: 'vin-processing-group' });
+const consumer = kafka.consumer({ groupId: process.env.KAFKA_GROUP_ID });
 const results = [];
 
 async function refillTokens() {
@@ -46,7 +48,7 @@ async function waitForToken() {
 async function startConsumer() {
     try {
       await consumer.connect();
-      await consumer.subscribe({ topic: 'vin-topic', fromBeginning: true });
+      await consumer.subscribe({ topic: process.env.KAFKA_TOPIC, fromBeginning: true });
   
       await consumer.run({
         eachMessage: async ({ topic, partition, message }) => {
@@ -358,7 +360,7 @@ class VinDecodingServer {
 const server = new VinDecodingServer({
     uploadsPath: '../API/uploads',
     decodedPath: './decoded',
-    port: 3002,
+    port: process.env.PORT,
     apiEndpoint: 'https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVin',
     watchInterval: 5000 // Check every 5 seconds
 });

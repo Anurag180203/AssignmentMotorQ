@@ -1,6 +1,5 @@
 const express = require('express');
 const app = express();
-const port = 3000;
 const uuid = require('uuid');
 const cron = require('node-cron');
 const Redis = require('ioredis');
@@ -8,10 +7,12 @@ const rateLimit = require('express-rate-limit');
 const morgan = require('morgan');
 const { body, param, validationResult } = require('express-validator');
 
+require('dotenv').config();
+
 // Initialize Redis client
 const redis = new Redis({
-  host: 'localhost',
-  port: 6379
+  host: process.env.REDIS_HOST,
+  port: process.env.REDIS_PORT
 });
 
 // Add request logging
@@ -29,11 +30,11 @@ app.use(limiter);
 const mysql = require('mysql2');
 
 const connection = mysql.createConnection({
-  host: 'localhost',
-  port: 3306,
-  user: 'root',
-  password: 'secret',
-  database: 'mySchema'
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE
 });
 
 // Remove the Maps since we're using database now
@@ -282,8 +283,8 @@ connection.connect((err) => {
   });
   
   // Only start the server after successfully connecting to the database
-  app.listen(port, () => {
-    console.log(`Enrollment service listening at http://localhost:${port}`);
+  app.listen(process.env.PORT, () => {
+    console.log(`Enrollment service listening at http://localhost:${process.env.PORT}`);
   });
 });
 

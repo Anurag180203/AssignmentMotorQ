@@ -5,10 +5,12 @@ const fs = require('fs');
 const path = require('path');
 const { Kafka } = require('kafkajs');
 
+require('dotenv').config();
+
 // Create a Kafka instance
 const kafka = new Kafka({
-  clientId: 'my-app',
-  brokers: ['localhost:9092'] // Replace with your Kafka container host and port
+  clientId: process.env.KAFKA_CLIENT_ID,
+  brokers: [process.env.KAFKA_BROKER] // Replace with your Kafka container host and port
 });
 
 const producer = kafka.producer();
@@ -35,7 +37,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
         .on('data', (row) => {
             console.log(row.VIN);
             producer.send({
-                topic: 'vin-topic',
+                topic: process.env.KAFKA_TOPIC,
                 messages: [{ value: row.VIN }]
             });
         })
@@ -45,6 +47,6 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 });
 
 // Starting the server
-app.listen(3001, () => {
-console.log('Server is running on port 3001');
+app.listen(process.env.PORT, () => {
+    console.log(`Server is running on port ${process.env.PORT}`);
 });
