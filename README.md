@@ -10,8 +10,6 @@ This project consists of three microservices working together to process vehicle
 2. **VIN Polling Client**: Consumes VINs from Kafka and decodes them using NHTSA API
 3. **Enrollment Service**: Manages vehicle enrollment and storage with caching capabilities
 
-![Architecture Diagram (Add your system diagram here)]()
-
 ## Services Overview
 
 ### 1. CSV to Kafka API
